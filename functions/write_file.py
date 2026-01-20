@@ -14,6 +14,6 @@ def write_file(working_directory, directory, content):
         os.makedirs(os.path.dirname(target_directory), exist_ok=True)
         with open(target_directory, 'w') as file:
             file.write(content)
-        print(f'Success: Content written to "{target_directory}"')
+        print(f'Successfully wrote to "{target_directory}" ({len(content)} characters written)')
     except Exception as e:
         print(f'Error: {str(e)}')
