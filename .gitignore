@@ -1,78 +1,50 @@
-# Python .gitignore template
+# Environment & Configuration
+.env
+.env.local
+*.env
 
-# Byte-compiled / optimized / DLL files
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-*.pyd
-*.dll
-
-# Distribution / packaging
+.Python
 build/
+develop-eggs/
 dist/
-*.egg-info/
+downloads/
+eggs/
 .eggs/
-pip-wheel-metadata/
+lib/
+lib64/
+parts/
+sdist/
+var/
 wheels/
+*.egg-info/
+.installed.cfg
 *.egg
-*.whl
 
-# Virtual environments
-env/
+# Virtual Environments
 venv/
-ENV/
+env/
 .venv/
-venv.bak/
-env.bak/
+ENV/
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage
-htmlcov/
-.coverage
-.coverage.*
+# Testing
 .pytest_cache/
-.nox/
-.cache
+.coverage/
+htmlcov/
+.tox/
 
-# Type checkers / linters
-.mypy_cache/
-.pyre/
-.pytype/
-
-# Jupyter
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-
-# Environment files
-.env
-.env.*
-
-# IDEs / editors
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# OS files
+# OS
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log
-debug.log
-
-# SQLite and DB files
-*.sqlite3
-
-# Misc build artifacts
-*.class
-*.o
-*.so
+.directory
