@@ -11,8 +11,11 @@ def get_files_info(working_directory, directory="."):
             raise ValueError(f"Error: Cannot list '{directory}' as it is outside the permitted working directory")
         if not target_directory: 
             raise ValueError(f'Error: "{directory}" is not a directory')
+        lines = []
         for file in os.listdir(target_directory):
-            print(f'- {file}: File Size: {os.path.getsize(os.path.join(target_directory, file))} bytes, is_dir={os.path.isdir(os.path.join(target_directory, file))}')
+            p = os.path.join(target_directory, file)
+            lines.append(f'- {file}: File Size: {os.path.getsize(p)} bytes, is_dir={os.path.isdir(p)}')
+        return "\n".join(lines)
     except Exception as e:
         print(f'Error: {str(e)}')
 

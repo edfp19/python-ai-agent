@@ -1,4 +1,5 @@
 import os
+from google.genai import types
 from config import *
 
 def get_file_content(working_directory, directory):
@@ -15,6 +16,21 @@ def get_file_content(working_directory, directory):
             content = file.read(MAX_CHARS)  # Read first MAX_CHARS characters
             if file.read(1):
                 content += f'[...File "{target_directory}" truncated at {MAX_CHARS} characters]'
-            print(content)
+        return content
     except Exception as e:
         print(f'Error: {str(e)}')
+
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Retrieves the content of a specified file relative to the working directory",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="File path to read content from, relative to the working directory",
+            ),
+        },
+        required=['directory'],
+    ),
+)

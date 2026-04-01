@@ -4,7 +4,7 @@ from google import genai
 from google.genai import types
 import argparse
 import prompts
-from functions.call_function import available_functions
+from functions.call_function import *
 
 
 def main():
@@ -44,16 +44,23 @@ def main():
         response_tokens = response.usage_metadata.candidates_token_count
     else:
         raise RuntimeError("No usage metadata found in the response.")
-
     if args.verbose:
         print("User prompt:", prompt)
         print("Prompt tokens:", prompt_tokens)
         print("Response tokens:", response_tokens)
     if response.function_calls:
+        function_results = []
         for function_call in response.function_calls:
-         print(f"Calling function: {function_call.name}({function_call.args})")
-    else:
-        print(response.text)
+            function_call_result = call_function(function_call, args.verbose)
+            if function_call_result.parts == [] or function_call_result.parts is None:
+                raise Exception("Function call result has no parts")
+            if function_call_result.parts[0].function_response is None:
+                raise Exception("Function call result part has no function response")
+            if function_call_result.parts[0].function_response.response is None:
+                raise Exception("Function call result part has no function response content")
+            function_results.append(function_call_result.parts[0])
+            if args.verbose:
+                print(f"-> {function_call_result.parts[0].function_response.response}")
 
 if __name__ == "__main__":
     main()

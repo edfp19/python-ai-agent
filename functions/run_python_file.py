@@ -1,5 +1,7 @@
 import os 
 import subprocess
+from google.genai import types
+
 
 def run_python_file(working_directory, file_path, args=None):
     try: 
@@ -21,16 +23,41 @@ def run_python_file(working_directory, file_path, args=None):
         if args: 
             command.extend(args)
         completed_process = subprocess.run(command, cwd=abs_path, capture_output=True, text=True, timeout=30)
+        output = ''
+        if completed_process.stdout:
+            output += completed_process.stdout
+        if completed_process.stderr:
+            output += completed_process.stderr
         if completed_process.returncode != 0:
             return f"Process exited with code {completed_process.returncode}." + f" STDERR: {completed_process.stderr}"
-        elif completed_process.stdout is None or completed_process.stdout.strip() == '':
+        elif output.strip() == "":
             return "No output produced"
         else: 
             return (
-                    f"Process exited with code {completed_process.returncode}\n"
-                    f"STDERR: {completed_process.stderr}\n"
-                    f"STDOUT: {completed_process.stdout}"
+                    #f"Process exited with code {completed_process.returncode}\n"
+                    output
+                    # f"STDERR: {completed_process.stderr}\n"
+                    # f"STDOUT: {completed_process.stdout}"
                     )
-        return output
     except Exception as e:
         return f"Error: executing Python file: {e}"
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Executes a Python file with optional arguments",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="Path to the Python file to execute, relative to the working directory",
+            ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                description="Optional arguments for the Python file",
+                items=types.Schema(type=types.Type.STRING),
+            ),
+        },
+        required=['file_path'],
+    ),
+)
