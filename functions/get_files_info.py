@@ -1,23 +1,33 @@
-import os 
+import os
 from google.genai import types
 
+
 def get_files_info(working_directory, directory="."):
-    try: 
-        abs_path = os.path.abspath(working_directory)
-        target_directory = os.path.normpath(os.path.join(abs_path, directory))
-        # check if target_directory is within absolute path 
-        valid_target = os.path.commonpath([abs_path, target_directory]) == abs_path
-        if not valid_target:
-            raise ValueError(f"Error: Cannot list '{directory}' as it is outside the permitted working directory")
-        if not target_directory: 
-            raise ValueError(f'Error: "{directory}" is not a directory')
+    try:
+        abs_path = os.path.realpath(working_directory)
+        target_directory = os.path.realpath(os.path.join(abs_path, directory))
+
+        # Ensure the target is inside the permitted working directory
+        if os.path.commonpath([abs_path, target_directory]) != abs_path:
+            return f"Error: Cannot list '{directory}' as it is outside the permitted working directory"
+
+        if not os.path.isdir(target_directory):
+            return f'Error: "{directory}" is not a directory'
+
         lines = []
-        for file in os.listdir(target_directory):
-            p = os.path.join(target_directory, file)
-            lines.append(f'- {file}: File Size: {os.path.getsize(p)} bytes, is_dir={os.path.isdir(p)}')
+        for fname in os.listdir(target_directory):
+            p = os.path.join(target_directory, fname)
+            try:
+                size = os.path.getsize(p)
+            except OSError:
+                size = 0
+            lines.append(
+                f"- {fname}: File Size: {size} bytes, is_dir={os.path.isdir(p)}"
+            )
         return "\n".join(lines)
     except Exception as e:
-        print(f'Error: {str(e)}')
+        return f"Error: {str(e)}"
+
 
 schema_get_files_info = types.FunctionDeclaration(
     name="get_files_info",
@@ -30,6 +40,6 @@ schema_get_files_info = types.FunctionDeclaration(
                 description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
             ),
         },
-        required=['directory'],
+        required=["directory"],
     ),
 )

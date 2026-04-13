@@ -1,23 +1,34 @@
-import os 
+import os
 from google.genai import types
 
+
 def write_file(working_directory, directory, content):
-    try: 
-        abs_path = os.path.abspath(working_directory)
-        target_directory = os.path.normpath(os.path.join(abs_path, directory))
-        #   check if target_directory is within absolute path 
-        valid_target = os.path.commonpath([abs_path, target_directory]) == abs_path
-        if not valid_target:
-            raise ValueError(f'Error: Cannot write to "{directory}" as it is outside the permitted working directory')
-        if os.path.isdir(target_directory):
-            raise ValueError(f'Error: Target path is a directory, not a file: {target_directory}')
-        #   ensure the directory exists
-        os.makedirs(os.path.dirname(target_directory), exist_ok=True)
-        with open(target_directory, 'w') as file:
+    try:
+        abs_path = os.path.realpath(working_directory)
+        target_path = os.path.realpath(os.path.join(abs_path, directory))
+
+        # check that the target is inside the permitted working directory
+        if os.path.commonpath([abs_path, target_path]) != abs_path:
+            return f'Error: Cannot write to "{directory}" as it is outside the permitted working directory'
+
+        if os.path.isdir(target_path):
+            return f"Error: Target path is a directory, not a file: {target_path}"
+
+        # ensure the containing directory exists
+        parent_dir = os.path.dirname(target_path)
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
+
+        # write file using a deterministic encoding
+        with open(target_path, "w", encoding="utf-8") as file:
             file.write(content)
-        print(f'Successfully wrote to "{target_directory}" ({len(content)} characters written)')
+
+        return (
+            f'Successfully wrote to "{target_path}" ({len(content)} characters written)'
+        )
     except Exception as e:
-        print(f'Error: {str(e)}')
+        return f"Error: {str(e)}"
+
 
 schema_write_file = types.FunctionDeclaration(
     name="write_file",
@@ -34,6 +45,6 @@ schema_write_file = types.FunctionDeclaration(
                 description="Content to write to the file",
             ),
         },
-        required=['directory', 'content'],
+        required=["directory", "content"],
     ),
 )
