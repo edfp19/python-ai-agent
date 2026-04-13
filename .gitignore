@@ -1,7 +1,7 @@
 # Environment & Configuration
 .env
 .env.local
-*.env
+
 
 # IDE & Editor
 .vscode/
